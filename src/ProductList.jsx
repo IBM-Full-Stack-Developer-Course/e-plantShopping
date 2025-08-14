@@ -269,7 +269,6 @@ function ProductList({ onHomeClick }) {
     }
 
     // Navigation
-
     const handleHomeClick = (e) => {
         e.preventDefault();
         onHomeClick();
@@ -279,6 +278,7 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(true); // Set showCart to true when cart icon is clicked
     };
+
     const handlePlantsClick = (e) => {
         e.preventDefault();
         setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
@@ -339,7 +339,12 @@ function ProductList({ onHomeClick }) {
                                         <img className="product-image" src={plant.image} alt={plant.name} />
                                         <p className={plant.sale ? "product-price product-price-sale" : "product-price"}>{plant.cost}</p>
                                         <p className="product-description">{plant.description}</p>
-                                        <button className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                                        <button className={addedToCart[plant.name] ? "product-button added-to-cart" : "product-button"}
+                                                onClick={() => handleAddToCart(plant)}
+                                                disabled={addedToCart[plant.name]}
+                                        >
+                                            {addedToCart[plant.name] ? "Added to Cart" :  "Add to Cart"}
+                                        </button>
                                     </div>
                                 ))}
                             </div>
