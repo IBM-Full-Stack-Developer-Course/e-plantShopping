@@ -1,14 +1,18 @@
+/* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {removeItem, updateQuantity} from './CartSlice';
+import {removeItem, selectTotalItems, updateQuantity} from '../../features/cart/CartSlice.jsx';
 import './CartItem.css';
 
 const CartItem = ({onContinueShopping}) => {
-    const cart = useSelector(state => state.cart.items);
+    const cart = useSelector(state => state.cart.items); // Accessing the cart contents from the store
+    const totalCartItems = useSelector(selectTotalItems);   // Keeping track of the total number of items
     const dispatch = useDispatch();
 
     // Calculate total amount for all products in the cart
+    // Not the same as totalCartItems, since the same item can be added multiple times,
+    // although, come to think of it, the two of them are a bit redundant
     const calculateTotalAmount = () => {
         let totalAmount = 0;
         if (cart.length > 0) {
@@ -51,11 +55,12 @@ const CartItem = ({onContinueShopping}) => {
 
     const handleCheckoutShopping = (e) => {
         alert('Functionality to be added for future reference');
+        console.log('I need to do something about the event for the linter warning to go away, so here it is: ', e);
     };
 
     return (
         <div className="cart-container">
-            <h2 style={{color: 'black'}}>Total Cart Amount: ${calculateTotalAmount()}</h2>
+            <h2 style={{color: 'black'}}>{totalCartItems === 0 ? 'Your Cart is Empty' : `Total Cart Amount: $${calculateTotalAmount()}`}</h2>
             <div>
                 {cart.map(item => (
                     <div className="cart-item" key={item.name}>
@@ -79,11 +84,19 @@ const CartItem = ({onContinueShopping}) => {
                 ))}
             </div>
             <div style={{marginTop: '20px', color: 'black'}} className='total_cart_amount'></div>
-            <div className="continue_shopping_btn">
-                <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping
+            <div className="cart-buttons-container">
+                <button className="cart-button"
+                        onClick={(e) => handleContinueShopping(e)}
+                >
+                    Continue Shopping
                 </button>
                 <br/>
-                <button className="get-started-button1" onClick={(e) => handleCheckoutShopping(e)}>Checkout</button>
+                <button className="cart-button"
+                        disabled={totalCartItems === 0}
+                        onClick={(e) => handleCheckoutShopping(e)}
+                >
+                    Checkout
+                </button>
             </div>
         </div>
     );

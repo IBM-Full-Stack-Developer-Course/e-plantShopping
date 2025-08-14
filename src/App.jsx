@@ -1,9 +1,9 @@
 
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
-import ProductList from './ProductList';
+import ProductList from './Components/Products/ProductList.jsx';
 import './App.css';
-import AboutUs from './AboutUs';
+import AboutUs from './Components/Landing/AboutUs.jsx';
 
 function App() {
   

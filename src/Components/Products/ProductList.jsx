@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+// eslint-disable-next-line no-unused-vars
+import React, {useState, useEffect} from 'react';
 import './ProductList.css'
-import CartItem from './CartItem';
-import { useDispatch } from "react-redux";
-import { addItem } from "./CartSlice";
+import CartItem from '../Cart/CartItem.jsx';
+import {useDispatch, useSelector} from "react-redux";
+import {addItem, selectTotalItems} from "../../features/cart/CartSlice.jsx";
 
-function ProductList({ onHomeClick }) {
+
+function ProductList({onHomeClick}) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, setAddedToCart] = useState([]);
-    const dispatch = useDispatch();
+    // This does nothing. It came with the starter code, but is not needed
+    // const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState([]); //Tracing which items have been added to the cart, as per requirements
+    const cartContents = useSelector(state => state.cart.items); // Accessing the cart contents from the store
+    const totalCartItems = useSelector(selectTotalItems); // Accessing the total number of items in the cart from the store
+    const dispatch = useDispatch(); // Does what it says
 
+    // The hardcoded data
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -19,7 +26,7 @@ function ProductList({ onHomeClick }) {
                     image: "https://cdn.pixabay.com/photo/2021/01/22/06/04/snake-plant-5939187_1280.jpg",
                     description: "Produces oxygen at night, improving air quality.",
                     cost: "$15",
-                    sale: true
+                    sale: true //Added sale state, so that not every item has to be on sale
                 },
                 {
                     name: "Spider Plant",
@@ -247,6 +254,11 @@ function ProductList({ onHomeClick }) {
             ]
         }
     ];
+
+    //These three came with the starter code. I honestly have no idea why they're necessary
+    // Probably ot show us how it's done?
+    //These three came with the starter code. I honestly have no idea why they're necessary
+    // Probably ot show us how it's done?
     const styleObj = {
         backgroundColor: '#4CAF50',
         color: '#fff!important',
@@ -256,20 +268,23 @@ function ProductList({ onHomeClick }) {
         alignItems: 'center',
         fontSize: '20px',
     }
-    const styleObjUl = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '1100px',
-    }
+    // No longer need tis one, I changed things a bit
+    // const styleObjUl = {
+    //     display: 'flex',
+    //     justifyContent: 'space-between',
+    //     alignItems: 'center',
+    //     width: '1100px',
+    // }
     const styleA = {
         color: 'white',
         fontSize: '30px',
         textDecoration: 'none',
     }
 
-    // Navigation
+
+    // Navigation event handlers
     const handleHomeClick = (e) => {
+        setShowCart(false) // Hide the cart when coming back from the Home screen with the "Get started" button
         e.preventDefault();
         onHomeClick();
     };
@@ -281,7 +296,8 @@ function ProductList({ onHomeClick }) {
 
     const handlePlantsClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
+        // This was redundant, didn't really need it
+        // setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
         setShowCart(false); // Hide the cart when navigating to About Us
     };
 
@@ -297,7 +313,6 @@ function ProductList({ onHomeClick }) {
             ...prevState,
             [item.name]: true
         }));
-
         // Apparently this would be less safe:
         // setAddedToCart(() => ({
         //     ...addedToCart,
@@ -305,26 +320,66 @@ function ProductList({ onHomeClick }) {
         // }));
     }
 
+    //Watch for changes in cart-contents, and update addedToCart to reflect them
+    useEffect(() => {
+        const newAddedToCart = {};
+        cartContents.forEach((item) => {
+            newAddedToCart[item.name] = true;
+        });
+        setAddedToCart(newAddedToCart);
+    }, [cartContents]);
+
     return (
         <div>
             <div className="navbar" style={styleObj}>
+                {/* Logo on the left */}
                 <div className="tag">
                     <div className="luxury">
-                        <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
-                        <a href="/" onClick={(e) => handleHomeClick(e)}>
-                            <div style={{ marginLeft: '20px' }}>
-                                <h3 style={{ color: 'white' }}>Paradise Nursery</h3>
-                                <i style={{ color: 'white' }}>Where Green Meets Serenity</i>
+                        <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt=""/>
+                        <a href="/public" onClick={(e) => handleHomeClick(e)}>
+                            <div style={{marginLeft: '20px'}}>
+                                <h3 style={{color: 'white'}}>Paradise Nursery</h3>
+                                <i style={{color: 'white'}}>Where Green Meets Serenity</i>
                             </div>
                         </a>
                     </div>
-
                 </div>
-                <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+
+                {/* Navigation container with flex-grow to push cart to right */}
+                <div style={{display: 'flex', flexGrow: 1, justifyContent: 'space-between', alignItems: 'center'}}>
+                    {/* Centered Plants link */}
+                    <a href="#"
+                       onClick={(e) => handlePlantsClick(e)}
+                       style={{
+                           ...styleA,
+                           position: 'absolute',
+                           left: '50%',
+                           transform: 'translateX(-50%)'
+                       }}>
+                        Plants
+                    </a>
+
+                    {/* Cart on the right */}
+                    <a href="#"
+                       onClick={(e) => handleCartClick(e)}
+                       style={{...styleA, marginLeft: 'auto'}}>
+                        <h1 className='cart'>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor"
+                                 height="68" width="68">
+                                <rect width="156" height="156" fill="none"></rect>
+                                <circle cx="80" cy="216" r="12"></circle>
+                                <circle cx="184" cy="216" r="12"></circle>
+                                <path
+                                    d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8"
+                                    fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round"
+                                    strokeWidth="2" id="mainIconPathAttribute"></path>
+                            </svg>
+                            <span className="cart_quantity_count">{totalCartItems}</span>
+                        </h1>
+                    </a>
                 </div>
             </div>
+
             {!showCart ? (
                 <div className="product-grid">
                     {plantsArray.map((item, index) => (
@@ -334,16 +389,18 @@ function ProductList({ onHomeClick }) {
                             </div>
                             <div className="product-list">
                                 {item.plants.map((plant, plantIndex) => (
-                                    <div key={plantIndex} className={plant.sale ? "product-card product-card-sale" : "product-card"}>
+                                    <div key={plantIndex}
+                                         className={plant.sale ? "product-card product-card-sale" : "product-card"}>
                                         <h3 className="product-title">{plant.name}</h3>
-                                        <img className="product-image" src={plant.image} alt={plant.name} />
+                                        <img className="product-image" src={plant.image} alt={plant.name}/>
                                         <p className={plant.sale ? "product-price product-price-sale" : "product-price"}>{plant.cost}</p>
                                         <p className="product-description">{plant.description}</p>
-                                        <button className={addedToCart[plant.name] ? "product-button added-to-cart" : "product-button"}
-                                                onClick={() => handleAddToCart(plant)}
-                                                disabled={addedToCart[plant.name]}
+                                        <button
+                                            className="product-button"
+                                            onClick={() => handleAddToCart(plant)}
+                                            disabled={addedToCart[plant.name]}
                                         >
-                                            {addedToCart[plant.name] ? "Added to Cart" :  "Add to Cart"}
+                                            {addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
                                         </button>
                                     </div>
                                 ))}
@@ -352,10 +409,9 @@ function ProductList({ onHomeClick }) {
                     ))}
 
 
-
                 </div>
             ) : (
-                <CartItem onContinueShopping={handleContinueShopping} />
+                <CartItem onContinueShopping={handleContinueShopping}/>
             )}
         </div>
     );
