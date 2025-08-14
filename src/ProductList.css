@@ -70,7 +70,7 @@ body {
     border-radius: 5px;
     text-align: center;
     position: relative;
-    
+    transition: transform 0.1s ease-in-out;
     gap: 20px;
 }
 
@@ -86,10 +86,21 @@ body {
     margin-bottom: 10px;
 }
 
+.product-card-sale:hover .product-price-sale {
+    transform: scale(1.2);
+    transition: transform 0.3s ease-in-out;
+
+}
 .product-price {
-    color: #e74c3c;
     font-size: 1.2rem;
     margin-bottom: 10px;
+}
+
+.product-price-sale {
+    color: #e74c3c;
+    font-weight: bold;
+    transform: scale(1);
+    transition: transform 0.1s ease-in-out;
 }
 
 .product-image {
@@ -112,8 +123,9 @@ body {
 }
 
 /* Pseudo-elements - Sale badge */
-.product-card::before {
+.product-card-sale::before {
     content: "SALE";
+    font-weight: normal;
     background-color: #e74c3c;
     color: #fff;
     position: absolute;
@@ -121,7 +133,17 @@ body {
     right: 0;
     padding: 5px 10px;
     border-radius: 0 0 0 5px;
+    transform: scale(1);
+    transition: all 0.1s ease-in-out;
+
 }
+
+.product-card-sale:hover::before {
+    font-weight: bold;
+    transform: scale(1.1);
+    transition: all 0.3s ease-in-out;
+}
+
 .tag_home_link{
     display: flex;
     /* background-color: red; */
@@ -136,7 +158,8 @@ body {
 .tag_home_link h3{
     font-size: 30px;
 }
-.tag a{
+.tag a {
+    color: white;
     text-decoration: none;
 }
 .tag {
@@ -160,6 +183,10 @@ body {
     width: 650px;
     font-size: 19px;
 }
+
+
+
+
 .cart{
     color: white;
     display: flex;
@@ -176,7 +203,7 @@ body {
    display: flex;
    align-items: center;
    justify-content: center;
-    /* background-color: yellow; */
+   /* background-color: yellow; */
 }
 .plant_heading{
     width: 400px;
